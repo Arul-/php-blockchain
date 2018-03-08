@@ -1,0 +1,19 @@
+{
+    "name": "arul/chain",
+    "description": "BlockChain example in PHP",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Arul",
+            "email": "arul@logicalsteps.net"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload":{
+        "psr-4":{
+            "":"src"
+        }
+    }
+}
