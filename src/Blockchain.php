@@ -3,6 +3,7 @@
 class Blockchain
 {
     public $chain;
+    public $difficulty = 2;
 
     public function __construct()
     {
@@ -22,7 +23,7 @@ class Blockchain
     public function addBlock(Block $block)
     {
         $block->previousHash = $this->getLatestBlock()->hash;
-        $block->hash = $block->calculateHash();
+        $block->mine($this->difficulty);
         $this->chain[] = $block;
     }
 
