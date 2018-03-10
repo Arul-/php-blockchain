@@ -12,19 +12,38 @@ function validate(Blockchain $chain)
 
 $blocks = new Blockchain();
 
-$blocks->addBlock(new Block(date('d/m/Y'), ['amount' => 4]));
-$blocks->addBlock(new Block(date('d/m/Y'), ['amount' => 8]));
+echo "Creating some transactions...\n";
 
-validate($blocks);
+$blocks->createTransaction(new Transaction('address1', 'address2', 100));
+$blocks->createTransaction(new Transaction('address2', 'address1', 50));
 
-//try to alter some value
-$blocks->chain[1]->data = ['amount' => 100];
+echo "Starting the miner...\n";
+
+$miner = 'aruls-address';
+
+$blocks->minePendingTransactions($miner);
+
+echo "Balance for address1 is " . $blocks->getBalanceOfAddress('address1') . PHP_EOL;
+
+echo "Balance for $miner is " . $blocks->getBalanceOfAddress($miner) . PHP_EOL;
+
+$blocks->minePendingTransactions($miner);
+
+echo "Balance for $miner is " . $blocks->getBalanceOfAddress($miner) . PHP_EOL;
 
 validate($blocks);
 
 /*
-//results for  `php test.php`
 
-Blockchain valid? true
-Blockchain valid? false
-*/
+  php test.php
+
+    Creating some transactions...
+    Starting the miner...
+    BLOCK MINED: 000001cdfa25df1b96408764c5a234996584c310ca0f5277c88cd5e4b02de998
+    Balance for address1 is -50
+    Balance for aruls-address is 0
+    BLOCK MINED: 000004ba1127cdc7a328d9a4b404456e5a628c5b43ddb1b858633d0c5eae39ba
+    Balance for aruls-address is 100
+    Blockchain valid? true
+
+ */

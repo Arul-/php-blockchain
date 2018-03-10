@@ -4,15 +4,30 @@ class Blockchain
 {
     public $chain;
     public $difficulty = 2;
+    /**
+     * @var array
+     */
+    public $pendingTransactions;
+    /**
+     * @var int
+     */
+    private $miningReward;
 
     public function __construct()
     {
         $this->chain = [$this->createGenesisBlock()];
+        $this->difficulty = 5;
+
+        // Place to store transactions in between block creation
+        $this->pendingTransactions = [];
+        // How many coins a miner will get as a reward for his/her efforts
+        $this->miningReward = 100;
+
     }
 
     protected function createGenesisBlock(): Block
     {
-        return new Block(date('d/m/Y'), ['first' => true], '0');
+        return new Block(date('d/m/Y'), '0', ...[]);
     }
 
     public function getLatestBlock(): Block
@@ -20,11 +35,41 @@ class Blockchain
         return $this->chain[count($this->chain) - 1];
     }
 
-    public function addBlock(Block $block)
+    public function createTransaction(Transaction $transaction)
     {
-        $block->previousHash = $this->getLatestBlock()->hash;
+        //TODO: validate the transaction here
+
+        $this->pendingTransactions[] = $transaction;
+    }
+
+    public function minePendingTransactions(string $miningRewardAddress)
+    {
+        $block = new Block(date('d/m/Y'), $this->getLatestBlock()->hash, ...$this->pendingTransactions);
         $block->mine($this->difficulty);
         $this->chain[] = $block;
+
+        // Reset the pending transactions and send the mining reward
+        $this->pendingTransactions = [
+            new Transaction(null, $miningRewardAddress, $this->miningReward)
+        ];
+    }
+
+    public function getBalanceOfAddress(string $address): float
+    {
+        $balance = 0;
+        /** @var Block $block */
+        foreach ($this->chain as $block) {
+            foreach ($block->transactions as $transaction) {
+                if ($transaction->fromAddress === $address) {
+                    $balance -= $transaction->amount;
+                }
+                if ($transaction->toAddress === $address) {
+                    $balance += $transaction->amount;
+                }
+            }
+        }
+
+        return $balance;
     }
 
     public function isValid(): bool

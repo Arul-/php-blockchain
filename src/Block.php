@@ -9,7 +9,7 @@ class Block
     /**
      * @var array
      */
-    public $data;
+    public $transactions;
     /**
      * @var string
      */
@@ -24,10 +24,10 @@ class Block
      */
     public $nonce;
 
-    public function __construct(string $timestamp, array $data, string $previousHash = '')
+    public function __construct(string $timestamp, string $previousHash = '', Transaction ...$transactions)
     {
         $this->timestamp = $timestamp;
-        $this->data = $data;
+        $this->transactions = $transactions;
         $this->previousHash = $previousHash;
         $this->hash = $this->calculateHash();
         $this->nonce = 0;
@@ -39,7 +39,7 @@ class Block
             'sha256',
             $this->previousHash .
             $this->timestamp .
-            json_encode($this->data) .
+            json_encode($this->transactions) .
             $this->nonce
         );
     }
